@@ -1,9 +1,12 @@
 import { AirplaneList } from "@/components/airplane-list"
-import { Plane, AlertCircle } from "lucide-react"
+import { Plane, AlertCircle, LogOut } from "lucide-react"
 import { getAirplanes } from "./actions"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Suspense } from "react"
 import { Card } from "@/components/ui/card"
+import { createClient } from "@/lib/supabase/server"
+import { Button } from "@/components/ui/button"
+import { redirect } from "next/navigation"
 
 export const dynamic = "force-dynamic"
 
@@ -50,17 +53,42 @@ function LoadingSkeleton() {
   )
 }
 
-export default function Home() {
+async function logout() {
+  "use server"
+  const supabase = await createClient()
+  await supabase.auth.signOut()
+  redirect("/auth/login")
+}
+
+export default async function Home() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <header className="mb-8 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
-            <Plane className="h-6 w-6 text-primary-foreground" />
+        <header className="mb-8">
+          <div className="mb-4 flex items-center justify-end">
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-muted-foreground">{user?.email}</span>
+              <form action={logout}>
+                <Button variant="outline" size="sm" type="submit">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Cerrar Sesión
+                </Button>
+              </form>
+            </div>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Gestión de Flota</h1>
-            <p className="text-sm text-muted-foreground">Sistema de administración de aeronaves LATAM</p>
+          <div className="flex items-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary">
+              <Plane className="h-6 w-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-foreground">Gestión de Flota</h1>
+              <p className="text-sm text-muted-foreground">Sistema de administración de aeronaves LATAM</p>
+            </div>
           </div>
         </header>
 
