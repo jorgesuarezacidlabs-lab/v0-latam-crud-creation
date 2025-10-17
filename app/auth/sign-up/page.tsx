@@ -33,11 +33,16 @@ export default function SignUpPage() {
     }
 
     try {
+      const isLocalhost = typeof window !== "undefined" && window.location.hostname === "localhost"
+      const redirectUrl = isLocalhost
+        ? process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || "http://localhost:3000"
+        : window.location.origin
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}`,
+          emailRedirectTo: redirectUrl,
         },
       })
       if (error) throw error
