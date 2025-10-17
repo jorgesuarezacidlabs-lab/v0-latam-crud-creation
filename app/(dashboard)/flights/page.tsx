@@ -1,9 +1,12 @@
-import { Calendar, AlertCircle } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Calendar } from "lucide-react"
+import { FlightList } from "@/components/flight-list"
+import { getFlights } from "@/app/actions"
 
 export const dynamic = "force-dynamic"
 
 export default async function FlightsPage() {
+  const flights = await getFlights()
+
   return (
     <div>
       <header className="mb-8">
@@ -18,14 +21,7 @@ export default async function FlightsPage() {
         </div>
       </header>
 
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Próximamente</AlertTitle>
-        <AlertDescription>
-          El módulo de gestión de vuelos estará disponible pronto. Podrás programar, editar y cancelar vuelos desde
-          aquí.
-        </AlertDescription>
-      </Alert>
+      <FlightList flights={flights} />
     </div>
   )
 }

@@ -1,9 +1,12 @@
-import { Wrench, AlertCircle } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Wrench } from "lucide-react"
+import { MaintenanceList } from "@/components/maintenance-list"
+import { getMaintenanceRecords } from "@/app/actions"
 
 export const dynamic = "force-dynamic"
 
 export default async function MaintenancePage() {
+  const records = await getMaintenanceRecords()
+
   return (
     <div>
       <header className="mb-8">
@@ -18,14 +21,7 @@ export default async function MaintenancePage() {
         </div>
       </header>
 
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Próximamente</AlertTitle>
-        <AlertDescription>
-          El módulo de gestión de mantenimiento estará disponible pronto. Podrás registrar y hacer seguimiento de
-          mantenimientos preventivos y correctivos.
-        </AlertDescription>
-      </Alert>
+      <MaintenanceList records={records} />
     </div>
   )
 }

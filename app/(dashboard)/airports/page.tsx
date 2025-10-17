@@ -1,9 +1,12 @@
-import { Building2, AlertCircle } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Building2 } from "lucide-react"
+import { AirportList } from "@/components/airport-list"
+import { getAirports } from "@/app/actions"
 
 export const dynamic = "force-dynamic"
 
 export default async function AirportsPage() {
+  const airports = await getAirports()
+
   return (
     <div>
       <header className="mb-8">
@@ -18,14 +21,7 @@ export default async function AirportsPage() {
         </div>
       </header>
 
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Próximamente</AlertTitle>
-        <AlertDescription>
-          El módulo de gestión de aeropuertos estará disponible pronto. Podrás administrar información de aeropuertos,
-          códigos IATA y capacidades.
-        </AlertDescription>
-      </Alert>
+      <AirportList airports={airports} />
     </div>
   )
 }

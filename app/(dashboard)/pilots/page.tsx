@@ -1,9 +1,12 @@
-import { Users, AlertCircle } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Users } from "lucide-react"
+import { PilotList } from "@/components/pilot-list"
+import { getPilots } from "@/app/actions"
 
 export const dynamic = "force-dynamic"
 
 export default async function PilotsPage() {
+  const pilots = await getPilots()
+
   return (
     <div>
       <header className="mb-8">
@@ -18,14 +21,7 @@ export default async function PilotsPage() {
         </div>
       </header>
 
-      <Alert>
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Próximamente</AlertTitle>
-        <AlertDescription>
-          El módulo de gestión de pilotos estará disponible pronto. Podrás gestionar pilotos, licencias y
-          certificaciones desde aquí.
-        </AlertDescription>
-      </Alert>
+      <PilotList pilots={pilots} />
     </div>
   )
 }
