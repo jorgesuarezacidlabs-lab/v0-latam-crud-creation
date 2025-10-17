@@ -6,8 +6,15 @@ import type { Route, RouteFormData } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Switch } from "@/components/ui/switch"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createRoute, updateRoute } from "@/app/actions"
 
 type RouteFormProps = {
@@ -76,6 +83,7 @@ export function RouteForm({ route, isOpen, onCancel, onSuccess }: RouteFormProps
 
       onSuccess()
     } catch (error) {
+      console.error("[v0] Error submitting form:", error)
       alert("Error al guardar la ruta")
     } finally {
       setIsSubmitting(false)
@@ -84,21 +92,47 @@ export function RouteForm({ route, isOpen, onCancel, onSuccess }: RouteFormProps
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{route ? "Editar Ruta" : "Agregar Ruta"}</DialogTitle>
+          <DialogDescription>
+            {route ? "Actualiza la información de la ruta" : "Completa los datos de la nueva ruta"}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="route_code">Código de Ruta</Label>
-            <Input
-              id="route_code"
-              placeholder="SCL-LIM"
-              value={formData.route_code}
-              onChange={(e) => setFormData({ ...formData, route_code: e.target.value })}
-              required
-            />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="route_code">Código de Ruta</Label>
+              <Input
+                id="route_code"
+                placeholder="SCL-LIM"
+                value={formData.route_code}
+                onChange={(e) => setFormData({ ...formData, route_code: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="frequency">Frecuencia</Label>
+              <Select
+                value={formData.frequency}
+                onValueChange={(value) => setFormData({ ...formData, frequency: value })}
+              >
+                <SelectTrigger id="frequency">
+                  <SelectValue placeholder="Seleccionar frecuencia" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Diario">Diario</SelectItem>
+                  <SelectItem value="Lunes a Viernes">Lunes a Viernes</SelectItem>
+                  <SelectItem value="Fines de semana">Fines de semana</SelectItem>
+                  <SelectItem value="Lunes, Miércoles, Viernes">Lunes, Miércoles, Viernes</SelectItem>
+                  <SelectItem value="Martes, Jueves, Sábado">Martes, Jueves, Sábado</SelectItem>
+                  <SelectItem value="Estacional">Estacional</SelectItem>
+                  <SelectItem value="Charter">Charter</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -106,7 +140,7 @@ export function RouteForm({ route, isOpen, onCancel, onSuccess }: RouteFormProps
               <Label htmlFor="origin">Origen</Label>
               <Input
                 id="origin"
-                placeholder="Santiago (SCL)"
+                placeholder="SCL - Santiago"
                 value={formData.origin}
                 onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
                 required
@@ -117,7 +151,7 @@ export function RouteForm({ route, isOpen, onCancel, onSuccess }: RouteFormProps
               <Label htmlFor="destination">Destino</Label>
               <Input
                 id="destination"
-                placeholder="Lima (LIM)"
+                placeholder="LIM - Lima"
                 value={formData.destination}
                 onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
                 required
@@ -131,16 +165,16 @@ export function RouteForm({ route, isOpen, onCancel, onSuccess }: RouteFormProps
               <Input
                 id="distance_km"
                 type="number"
-                placeholder="2400"
+                placeholder="2500"
                 value={formData.distance_km}
                 onChange={(e) => setFormData({ ...formData, distance_km: e.target.value })}
                 required
-                min="1"
+                min="0"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="estimated_duration">Duración (min)</Label>
+              <Label htmlFor="estimated_duration">Duración Estimada (min)</Label>
               <Input
                 id="estimated_duration"
                 type="number"
@@ -148,32 +182,25 @@ export function RouteForm({ route, isOpen, onCancel, onSuccess }: RouteFormProps
                 value={formData.estimated_duration}
                 onChange={(e) => setFormData({ ...formData, estimated_duration: e.target.value })}
                 required
-                min="1"
+                min="0"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="frequency">Frecuencia</Label>
-            <Input
-              id="frequency"
-              placeholder="Diaria"
-              value={formData.frequency}
-              onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
-              required
-            />
-          </div>
-
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <Label htmlFor="active">Ruta Activa</Label>
-              <p className="text-sm text-muted-foreground">La ruta está disponible para vuelos</p>
-            </div>
-            <Switch
-              id="active"
-              checked={formData.active}
-              onCheckedChange={(checked) => setFormData({ ...formData, active: checked })}
-            />
+            <Label htmlFor="active">Estado de la Ruta</Label>
+            <Select
+              value={formData.active ? "true" : "false"}
+              onValueChange={(value) => setFormData({ ...formData, active: value === "true" })}
+            >
+              <SelectTrigger id="active">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Activa</SelectItem>
+                <SelectItem value="false">Inactiva</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0">
