@@ -123,3 +123,20 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* MapLibre GL styles */
+.maplibregl-popup-content {
+  @apply rounded-lg border bg-card p-0 shadow-lg;
+}
+
+.maplibregl-popup-content h3 {
+  @apply font-semibold text-foreground;
+}
+
+.maplibregl-popup-content p {
+  @apply text-sm text-muted-foreground;
+}
+
+.maplibregl-popup-close-button {
+  @apply text-muted-foreground hover:text-foreground;
+}
