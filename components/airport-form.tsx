@@ -6,14 +6,7 @@ import type { Airport, AirportFormData } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { createAirport, updateAirport } from "@/app/actions"
 
 type AirportFormProps = {
@@ -82,7 +75,6 @@ export function AirportForm({ airport, isOpen, onCancel, onSuccess }: AirportFor
 
       onSuccess()
     } catch (error) {
-      console.error("[v0] Error submitting form:", error)
       alert("Error al guardar el aeropuerto")
     } finally {
       setIsSubmitting(false)
@@ -91,12 +83,9 @@ export function AirportForm({ airport, isOpen, onCancel, onSuccess }: AirportFor
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>{airport ? "Editar Aeropuerto" : "Agregar Aeropuerto"}</DialogTitle>
-          <DialogDescription>
-            {airport ? "Actualiza la información del aeropuerto" : "Completa los datos del nuevo aeropuerto"}
-          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -114,7 +103,7 @@ export function AirportForm({ airport, isOpen, onCancel, onSuccess }: AirportFor
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="runways">Número de Pistas</Label>
+              <Label htmlFor="runways">Pistas</Label>
               <Input
                 id="runways"
                 type="number"
@@ -175,7 +164,7 @@ export function AirportForm({ airport, isOpen, onCancel, onSuccess }: AirportFor
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="elevation_ft">Elevación (pies)</Label>
+              <Label htmlFor="elevation_ft">Elevación (ft)</Label>
               <Input
                 id="elevation_ft"
                 type="number"
