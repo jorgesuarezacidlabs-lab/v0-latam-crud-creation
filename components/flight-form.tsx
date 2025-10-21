@@ -6,18 +6,9 @@ import type { Flight, FlightFormData } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createFlight, updateFlight } from "@/app/actions"
-import { getAirplanes } from "@/app/actions"
-import type { Airplane } from "@/lib/types"
 
 type FlightFormProps = {
   flight: Flight | null
@@ -38,19 +29,6 @@ export function FlightForm({ flight, isOpen, onCancel, onSuccess }: FlightFormPr
     passengers: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [airplanes, setAirplanes] = useState<Airplane[]>([])
-
-  useEffect(() => {
-    const loadAirplanes = async () => {
-      try {
-        const data = await getAirplanes()
-        setAirplanes(data)
-      } catch (error) {
-        console.error("Error loading airplanes:", error)
-      }
-    }
-    loadAirplanes()
-  }, [])
 
   useEffect(() => {
     if (flight) {
@@ -102,7 +80,6 @@ export function FlightForm({ flight, isOpen, onCancel, onSuccess }: FlightFormPr
 
       onSuccess()
     } catch (error) {
-      console.error("[v0] Error submitting form:", error)
       alert("Error al guardar el vuelo")
     } finally {
       setIsSubmitting(false)
@@ -111,45 +88,21 @@ export function FlightForm({ flight, isOpen, onCancel, onSuccess }: FlightFormPr
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>{flight ? "Editar Vuelo" : "Agregar Vuelo"}</DialogTitle>
-          <DialogDescription>
-            {flight ? "Actualiza la información del vuelo" : "Completa los datos del nuevo vuelo"}
-          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="flight_number">Número de Vuelo</Label>
-              <Input
-                id="flight_number"
-                placeholder="LA123"
-                value={formData.flight_number}
-                onChange={(e) => setFormData({ ...formData, flight_number: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="airplane_id">Aeronave</Label>
-              <Select
-                value={formData.airplane_id}
-                onValueChange={(value) => setFormData({ ...formData, airplane_id: value })}
-              >
-                <SelectTrigger id="airplane_id">
-                  <SelectValue placeholder="Seleccionar aeronave" />
-                </SelectTrigger>
-                <SelectContent>
-                  {airplanes.map((airplane) => (
-                    <SelectItem key={airplane.id} value={airplane.id}>
-                      {airplane.registration} - {airplane.model}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="flight_number">Número de Vuelo</Label>
+            <Input
+              id="flight_number"
+              placeholder="LA800"
+              value={formData.flight_number}
+              onChange={(e) => setFormData({ ...formData, flight_number: e.target.value })}
+              required
+            />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -178,7 +131,7 @@ export function FlightForm({ flight, isOpen, onCancel, onSuccess }: FlightFormPr
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="departure_time">Hora de Salida</Label>
+              <Label htmlFor="departure_time">Salida</Label>
               <Input
                 id="departure_time"
                 type="datetime-local"
@@ -189,7 +142,7 @@ export function FlightForm({ flight, isOpen, onCancel, onSuccess }: FlightFormPr
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="arrival_time">Hora de Llegada</Label>
+              <Label htmlFor="arrival_time">Llegada</Label>
               <Input
                 id="arrival_time"
                 type="datetime-local"

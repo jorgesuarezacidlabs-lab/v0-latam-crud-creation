@@ -3,8 +3,7 @@
 import type { Airport } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Pencil, Trash2, Plus, Building2 } from "lucide-react"
+import { Pencil, Trash2, Plus } from "lucide-react"
 import { useState } from "react"
 import { AirportForm } from "./airport-form"
 import { deleteAirport } from "@/app/actions"
@@ -25,39 +24,15 @@ export function AirportList({ airports }: AirportListProps) {
         await deleteAirport(id)
         router.refresh()
       } catch (error) {
-        console.error("[v0] Error deleting airport:", error)
         alert("Error al eliminar el aeropuerto")
       }
     }
   }
 
-  const handleEdit = (airport: Airport) => {
-    setEditingAirport(airport)
-    setIsFormOpen(true)
-  }
-
-  const handleCancel = () => {
-    setEditingAirport(null)
-    setIsFormOpen(false)
-  }
-
-  const handleSuccess = () => {
-    setEditingAirport(null)
-    setIsFormOpen(false)
-    router.refresh()
-  }
-
-  const formatElevation = (elevation: number | null) => {
-    if (!elevation) return "No especificado"
-    return `${elevation.toLocaleString()} ft`
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          {airports.length} {airports.length === 1 ? "aeropuerto" : "aeropuertos"} registrados
-        </p>
+        <p className="text-sm text-muted-foreground">{airports.length} aeropuertos registrados</p>
         <Button onClick={() => setIsFormOpen(true)} className="gap-2">
           <Plus className="h-4 w-4" />
           Agregar Aeropuerto
@@ -70,33 +45,41 @@ export function AirportList({ airports }: AirportListProps) {
             <div className="space-y-4">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
-                  <h3 className="font-mono text-lg font-semibold text-foreground">{airport.iata_code}</h3>
-                  <p className="text-sm text-muted-foreground">{airport.name}</p>
+                  <h3 className="font-mono text-lg font-semibold">{airport.iata_code}</h3>
+                  <p className="text-sm font-medium">{airport.name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {airport.city}, {airport.country}
+                  </p>
                 </div>
-                <Badge variant="secondary">{airport.country}</Badge>
               </div>
 
-              <div className="space-y-2 border-t border-border pt-4">
+              <div className="space-y-2 border-t pt-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Ciudad</span>
-                  <span className="font-medium text-foreground">{airport.city}</span>
+                  <span className="text-muted-foreground">Zona horaria</span>
+                  <span className="font-medium">{airport.timezone}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Pistas</span>
-                  <span className="font-medium text-foreground">{airport.runways}</span>
+                  <span className="font-medium">{airport.runways}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Elevación</span>
-                  <span className="font-medium text-foreground">{formatElevation(airport.elevation_ft)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Zona Horaria</span>
-                  <span className="font-medium text-foreground">{airport.timezone}</span>
-                </div>
+                {airport.elevation_ft && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Elevación</span>
+                    <span className="font-medium">{airport.elevation_ft.toLocaleString()} ft</span>
+                  </div>
+                )}
               </div>
 
-              <div className="flex gap-2 border-t border-border pt-4">
-                <Button variant="outline" size="sm" onClick={() => handleEdit(airport)} className="flex-1 gap-2">
+              <div className="flex gap-2 border-t pt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setEditingAirport(airport)
+                    setIsFormOpen(true)
+                  }}
+                  className="flex-1 gap-2"
+                >
                   <Pencil className="h-3.5 w-3.5" />
                   Editar
                 </Button>
@@ -117,16 +100,23 @@ export function AirportList({ airports }: AirportListProps) {
 
       {airports.length === 0 && (
         <Card className="p-12 text-center">
-          <div className="flex flex-col items-center gap-4">
-            <Building2 className="h-12 w-12 text-muted-foreground" />
-            <p className="text-muted-foreground">
-              No hay aeropuertos registrados. Haz clic en "Agregar Aeropuerto" para comenzar.
-            </p>
-          </div>
+          <p className="text-muted-foreground">No hay aeropuertos registrados.</p>
         </Card>
       )}
 
-      <AirportForm airport={editingAirport} isOpen={isFormOpen} onCancel={handleCancel} onSuccess={handleSuccess} />
+      <AirportForm
+        airport={editingAirport}
+        isOpen={isFormOpen}
+        onCancel={() => {
+          setEditingAirport(null)
+          setIsFormOpen(false)
+        }}
+        onSuccess={() => {
+          setEditingAirport(null)
+          setIsFormOpen(false)
+          router.refresh()
+        }}
+      />
     </div>
   )
 }

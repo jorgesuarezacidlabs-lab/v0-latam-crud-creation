@@ -6,14 +6,7 @@ import type { Pilot, PilotFormData } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createPilot, updatePilot } from "@/app/actions"
 
@@ -70,7 +63,10 @@ export function PilotForm({ pilot, isOpen, onCancel, onSuccess }: PilotFormProps
         license_number: formData.license_number,
         nationality: formData.nationality,
         flight_hours: Number.parseInt(formData.flight_hours),
-        certifications: formData.certifications.split(",").map(cert => cert.trim()).filter(cert => cert),
+        certifications: formData.certifications
+          .split(",")
+          .map((c) => c.trim())
+          .filter(Boolean),
         status: formData.status,
         hire_date: formData.hire_date,
       }
@@ -83,7 +79,6 @@ export function PilotForm({ pilot, isOpen, onCancel, onSuccess }: PilotFormProps
 
       onSuccess()
     } catch (error) {
-      console.error("[v0] Error submitting form:", error)
       alert("Error al guardar el piloto")
     } finally {
       setIsSubmitting(false)
@@ -92,40 +87,35 @@ export function PilotForm({ pilot, isOpen, onCancel, onSuccess }: PilotFormProps
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>{pilot ? "Editar Piloto" : "Agregar Piloto"}</DialogTitle>
-          <DialogDescription>
-            {pilot ? "Actualiza la información del piloto" : "Completa los datos del nuevo piloto"}
-          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Nombre Completo</Label>
+            <Input
+              id="name"
+              placeholder="Juan Pérez"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+            />
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="name">Nombre Completo</Label>
-              <Input
-                id="name"
-                placeholder="Juan Pérez"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="license_number">Número de Licencia</Label>
+              <Label htmlFor="license_number">Licencia</Label>
               <Input
                 id="license_number"
-                placeholder="ATP-123456"
+                placeholder="ATP-12345"
                 value={formData.license_number}
                 onChange={(e) => setFormData({ ...formData, license_number: e.target.value })}
                 required
               />
             </div>
-          </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="nationality">Nacionalidad</Label>
               <Input
@@ -136,35 +126,22 @@ export function PilotForm({ pilot, isOpen, onCancel, onSuccess }: PilotFormProps
                 required
               />
             </div>
+          </div>
 
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="flight_hours">Horas de Vuelo</Label>
               <Input
                 id="flight_hours"
                 type="number"
-                placeholder="2500"
+                placeholder="5000"
                 value={formData.flight_hours}
                 onChange={(e) => setFormData({ ...formData, flight_hours: e.target.value })}
                 required
                 min="0"
               />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="certifications">Certificaciones</Label>
-            <Input
-              id="certifications"
-              placeholder="Boeing 787, Airbus A320, IFR"
-              value={formData.certifications}
-              onChange={(e) => setFormData({ ...formData, certifications: e.target.value })}
-            />
-            <p className="text-xs text-muted-foreground">
-              Separa múltiples certificaciones con comas
-            </p>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="hire_date">Fecha de Contratación</Label>
               <Input
@@ -175,23 +152,33 @@ export function PilotForm({ pilot, isOpen, onCancel, onSuccess }: PilotFormProps
                 required
               />
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="status">Estado</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value: PilotFormData["status"]) => setFormData({ ...formData, status: value })}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Activo">Activo</SelectItem>
-                  <SelectItem value="Inactivo">Inactivo</SelectItem>
-                  <SelectItem value="En entrenamiento">En entrenamiento</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="certifications">Certificaciones (separadas por coma)</Label>
+            <Input
+              id="certifications"
+              placeholder="Boeing 787, Airbus A320"
+              value={formData.certifications}
+              onChange={(e) => setFormData({ ...formData, certifications: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="status">Estado</Label>
+            <Select
+              value={formData.status}
+              onValueChange={(value: PilotFormData["status"]) => setFormData({ ...formData, status: value })}
+            >
+              <SelectTrigger id="status">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Activo">Activo</SelectItem>
+                <SelectItem value="Inactivo">Inactivo</SelectItem>
+                <SelectItem value="En entrenamiento">En entrenamiento</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0">

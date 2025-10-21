@@ -6,27 +6,19 @@ import type { Maintenance, MaintenanceFormData } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createMaintenance, updateMaintenance } from "@/app/actions"
-import { getAirplanes } from "@/app/actions"
-import type { Airplane } from "@/lib/types"
 
 type MaintenanceFormProps = {
-  maintenance: Maintenance | null
+  record: Maintenance | null
   isOpen: boolean
   onCancel: () => void
   onSuccess: () => void
 }
 
-export function MaintenanceForm({ maintenance, isOpen, onCancel, onSuccess }: MaintenanceFormProps) {
+export function MaintenanceForm({ record, isOpen, onCancel, onSuccess }: MaintenanceFormProps) {
   const [formData, setFormData] = useState({
     airplane_id: "",
     maintenance_type: "Preventivo" as MaintenanceFormData["maintenance_type"],
@@ -38,31 +30,18 @@ export function MaintenanceForm({ maintenance, isOpen, onCancel, onSuccess }: Ma
     status: "Programado" as MaintenanceFormData["status"],
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [airplanes, setAirplanes] = useState<Airplane[]>([])
 
   useEffect(() => {
-    const loadAirplanes = async () => {
-      try {
-        const data = await getAirplanes()
-        setAirplanes(data)
-      } catch (error) {
-        console.error("Error loading airplanes:", error)
-      }
-    }
-    loadAirplanes()
-  }, [])
-
-  useEffect(() => {
-    if (maintenance) {
+    if (record) {
       setFormData({
-        airplane_id: maintenance.airplane_id || "",
-        maintenance_type: maintenance.maintenance_type,
-        description: maintenance.description,
-        technician: maintenance.technician,
-        start_date: maintenance.start_date,
-        end_date: maintenance.end_date || "",
-        cost: maintenance.cost?.toString() || "",
-        status: maintenance.status,
+        airplane_id: record.airplane_id || "",
+        maintenance_type: record.maintenance_type,
+        description: record.description,
+        technician: record.technician,
+        start_date: record.start_date,
+        end_date: record.end_date || "",
+        cost: record.cost?.toString() || "",
+        status: record.status,
       })
     } else {
       setFormData({
@@ -76,7 +55,7 @@ export function MaintenanceForm({ maintenance, isOpen, onCancel, onSuccess }: Ma
         status: "Programado",
       })
     }
-  }, [maintenance, isOpen])
+  }, [record, isOpen])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -94,16 +73,15 @@ export function MaintenanceForm({ maintenance, isOpen, onCancel, onSuccess }: Ma
         status: formData.status,
       }
 
-      if (maintenance) {
-        await updateMaintenance(maintenance.id, maintenanceData)
+      if (record) {
+        await updateMaintenance(record.id, maintenanceData)
       } else {
         await createMaintenance(maintenanceData)
       }
 
       onSuccess()
     } catch (error) {
-      console.error("[v0] Error submitting form:", error)
-      alert("Error al guardar el registro de mantenimiento")
+      alert("Error al guardar el registro")
     } finally {
       setIsSubmitting(false)
     }
@@ -111,40 +89,18 @@ export function MaintenanceForm({ maintenance, isOpen, onCancel, onSuccess }: Ma
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{maintenance ? "Editar Mantenimiento" : "Agregar Mantenimiento"}</DialogTitle>
-          <DialogDescription>
-            {maintenance ? "Actualiza la información del mantenimiento" : "Completa los datos del nuevo mantenimiento"}
-          </DialogDescription>
+          <DialogTitle>{record ? "Editar Registro" : "Agregar Registro"}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="airplane_id">Aeronave</Label>
-              <Select
-                value={formData.airplane_id}
-                onValueChange={(value) => setFormData({ ...formData, airplane_id: value })}
-              >
-                <SelectTrigger id="airplane_id">
-                  <SelectValue placeholder="Seleccionar aeronave" />
-                </SelectTrigger>
-                <SelectContent>
-                  {airplanes.map((airplane) => (
-                    <SelectItem key={airplane.id} value={airplane.id}>
-                      {airplane.registration} - {airplane.model}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="maintenance_type">Tipo de Mantenimiento</Label>
+              <Label htmlFor="maintenance_type">Tipo</Label>
               <Select
                 value={formData.maintenance_type}
-                onValueChange={(value: MaintenanceFormData["maintenance_type"]) => 
+                onValueChange={(value: MaintenanceFormData["maintenance_type"]) =>
                   setFormData({ ...formData, maintenance_type: value })
                 }
               >
@@ -159,43 +115,47 @@ export function MaintenanceForm({ maintenance, isOpen, onCancel, onSuccess }: Ma
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="status">Estado</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value: MaintenanceFormData["status"]) => setFormData({ ...formData, status: value })}
+              >
+                <SelectTrigger id="status">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Programado">Programado</SelectItem>
+                  <SelectItem value="En progreso">En progreso</SelectItem>
+                  <SelectItem value="Completado">Completado</SelectItem>
+                  <SelectItem value="Cancelado">Cancelado</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="description">Descripción</Label>
-            <Input
+            <Textarea
               id="description"
-              placeholder="Descripción detallada del mantenimiento"
+              placeholder="Describe el trabajo de mantenimiento..."
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               required
+              rows={3}
             />
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="technician">Técnico Responsable</Label>
-              <Input
-                id="technician"
-                placeholder="Juan Pérez"
-                value={formData.technician}
-                onChange={(e) => setFormData({ ...formData, technician: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cost">Costo (USD)</Label>
-              <Input
-                id="cost"
-                type="number"
-                placeholder="5000"
-                value={formData.cost}
-                onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
-                min="0"
-                step="0.01"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="technician">Técnico</Label>
+            <Input
+              id="technician"
+              placeholder="Nombre del técnico"
+              value={formData.technician}
+              onChange={(e) => setFormData({ ...formData, technician: e.target.value })}
+              required
+            />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -211,7 +171,7 @@ export function MaintenanceForm({ maintenance, isOpen, onCancel, onSuccess }: Ma
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="end_date">Fecha de Finalización</Label>
+              <Label htmlFor="end_date">Fecha de Fin</Label>
               <Input
                 id="end_date"
                 type="date"
@@ -222,21 +182,16 @@ export function MaintenanceForm({ maintenance, isOpen, onCancel, onSuccess }: Ma
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="status">Estado</Label>
-            <Select
-              value={formData.status}
-              onValueChange={(value: MaintenanceFormData["status"]) => setFormData({ ...formData, status: value })}
-            >
-              <SelectTrigger id="status">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Programado">Programado</SelectItem>
-                <SelectItem value="En progreso">En progreso</SelectItem>
-                <SelectItem value="Completado">Completado</SelectItem>
-                <SelectItem value="Cancelado">Cancelado</SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="cost">Costo (USD)</Label>
+            <Input
+              id="cost"
+              type="number"
+              placeholder="5000"
+              value={formData.cost}
+              onChange={(e) => setFormData({ ...formData, cost: e.target.value })}
+              min="0"
+              step="0.01"
+            />
           </div>
 
           <DialogFooter className="gap-2 sm:gap-0">
@@ -244,7 +199,7 @@ export function MaintenanceForm({ maintenance, isOpen, onCancel, onSuccess }: Ma
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Guardando..." : maintenance ? "Actualizar" : "Crear"}
+              {isSubmitting ? "Guardando..." : record ? "Actualizar" : "Crear"}
             </Button>
           </DialogFooter>
         </form>
