@@ -2,6 +2,7 @@ import type React from "react"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { Sidebar } from "@/components/sidebar"
+import { WelcomeToast } from "@/components/welcome-toast"
 
 async function logout() {
   "use server"
@@ -30,6 +31,7 @@ export default async function DashboardLayout({
       <main className="flex-1 overflow-y-auto bg-background">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">{children}</div>
       </main>
+      <WelcomeToast />
     </div>
   )
 }
