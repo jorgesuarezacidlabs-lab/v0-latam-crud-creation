@@ -10,8 +10,10 @@ import { Label } from "@/components/ui/label"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { Plane } from "lucide-react"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 export default function LoginPage() {
+  const { showSuccess, showError, showInfo } = useAviationToast()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -53,10 +55,13 @@ export default function LoginPage() {
         },
       })
       if (error) throw error
+      showSuccess("¡Bienvenido!", "Has iniciado sesión exitosamente")
       router.push("/")
       router.refresh()
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Ocurrió un error")
+      const errorMessage = error instanceof Error ? error.message : "Ocurrió un error"
+      setError(errorMessage)
+      showError("Error al iniciar sesión", errorMessage)
     } finally {
       setIsLoading(false)
     }

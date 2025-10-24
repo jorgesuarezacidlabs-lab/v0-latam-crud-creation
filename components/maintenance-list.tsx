@@ -9,6 +9,7 @@ import { useState } from "react"
 import { MaintenanceForm } from "./maintenance-form"
 import { deleteMaintenance } from "@/app/actions"
 import { useRouter } from "next/navigation"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 type MaintenanceListProps = {
   records: Maintenance[]
@@ -29,6 +30,7 @@ const typeColors = {
 }
 
 export function MaintenanceList({ records }: MaintenanceListProps) {
+  const { showMaintenanceSuccess, showError } = useAviationToast()
   const [editingRecord, setEditingRecord] = useState<Maintenance | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const router = useRouter()
@@ -37,9 +39,10 @@ export function MaintenanceList({ records }: MaintenanceListProps) {
     if (confirm("¿Estás seguro de que deseas eliminar este registro?")) {
       try {
         await deleteMaintenance(id)
+        showMaintenanceSuccess("deleted")
         router.refresh()
       } catch (error) {
-        alert("Error al eliminar el registro")
+        showError("Error al eliminar el registro", "No se pudo eliminar el registro. Inténtalo de nuevo.")
       }
     }
   }

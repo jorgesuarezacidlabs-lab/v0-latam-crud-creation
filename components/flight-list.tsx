@@ -9,6 +9,7 @@ import { useState } from "react"
 import { FlightForm } from "./flight-form"
 import { deleteFlight } from "@/app/actions"
 import { useRouter } from "next/navigation"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 type FlightListProps = {
   flights: Flight[]
@@ -23,17 +24,20 @@ const statusColors = {
 }
 
 export function FlightList({ flights }: FlightListProps) {
+  const { showFlightSuccess, showError } = useAviationToast()
   const [editingFlight, setEditingFlight] = useState<Flight | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const router = useRouter()
 
   const handleDelete = async (id: string) => {
+    const flight = flights.find(f => f.id === id)
     if (confirm("¿Estás seguro de que deseas eliminar este vuelo?")) {
       try {
         await deleteFlight(id)
+        showFlightSuccess("deleted", flight?.flight_number)
         router.refresh()
       } catch (error) {
-        alert("Error al eliminar el vuelo")
+        showError("Error al eliminar el vuelo", "No se pudo eliminar el vuelo. Inténtalo de nuevo.")
       }
     }
   }

@@ -9,23 +9,27 @@ import { useState } from "react"
 import { RouteForm } from "./route-form"
 import { deleteRoute } from "@/app/actions"
 import { useRouter } from "next/navigation"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 type RouteListProps = {
   routes: Route[]
 }
 
 export function RouteList({ routes }: RouteListProps) {
+  const { showRouteSuccess, showError } = useAviationToast()
   const [editingRoute, setEditingRoute] = useState<Route | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const router = useRouter()
 
   const handleDelete = async (id: string) => {
+    const route = routes.find(r => r.id === id)
     if (confirm("¿Estás seguro de que deseas eliminar esta ruta?")) {
       try {
         await deleteRoute(id)
+        showRouteSuccess("deleted", route?.route_code)
         router.refresh()
       } catch (error) {
-        alert("Error al eliminar la ruta")
+        showError("Error al eliminar la ruta", "No se pudo eliminar la ruta. Inténtalo de nuevo.")
       }
     }
   }

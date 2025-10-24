@@ -11,8 +11,10 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Plane } from "lucide-react"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 export default function SignUpPage() {
+  const { showSuccess, showError, showInfo } = useAviationToast()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [repeatPassword, setRepeatPassword] = useState("")
@@ -28,6 +30,7 @@ export default function SignUpPage() {
 
     if (password !== repeatPassword) {
       setError("Las contraseñas no coinciden")
+      showError("Las contraseñas no coinciden", "Por favor, verifica que ambas contraseñas sean idénticas")
       setIsLoading(false)
       return
     }
@@ -46,9 +49,12 @@ export default function SignUpPage() {
         },
       })
       if (error) throw error
+      showSuccess("¡Cuenta creada exitosamente!", "Revisa tu email para confirmar tu cuenta")
       router.push("/auth/sign-up-success")
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "Ocurrió un error")
+      const errorMessage = error instanceof Error ? error.message : "Ocurrió un error"
+      setError(errorMessage)
+      showError("Error al crear la cuenta", errorMessage)
     } finally {
       setIsLoading(false)
     }

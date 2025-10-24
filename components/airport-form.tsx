@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { createAirport, updateAirport } from "@/app/actions"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 type AirportFormProps = {
   airport: Airport | null
@@ -17,6 +18,7 @@ type AirportFormProps = {
 }
 
 export function AirportForm({ airport, isOpen, onCancel, onSuccess }: AirportFormProps) {
+  const { showAirportSuccess, showError } = useAviationToast()
   const [formData, setFormData] = useState({
     iata_code: "",
     name: "",
@@ -69,13 +71,15 @@ export function AirportForm({ airport, isOpen, onCancel, onSuccess }: AirportFor
 
       if (airport) {
         await updateAirport(airport.id, airportData)
+        showAirportSuccess("updated", airport.name)
       } else {
         await createAirport(airportData)
+        showAirportSuccess("created", formData.name)
       }
 
       onSuccess()
     } catch (error) {
-      alert("Error al guardar el aeropuerto")
+      showError("Error al guardar el aeropuerto", "Verifica que todos los datos sean correctos")
     } finally {
       setIsSubmitting(false)
     }

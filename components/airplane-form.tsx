@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createAirplane, updateAirplane } from "@/app/actions"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 type AirplaneFormProps = {
   airplane: Airplane | null
@@ -25,6 +26,7 @@ type AirplaneFormProps = {
 }
 
 export function AirplaneForm({ airplane, isOpen, onCancel, onSuccess }: AirplaneFormProps) {
+  const { showAirplaneSuccess, showError } = useAviationToast()
   const [formData, setFormData] = useState({
     registration: "",
     model: "",
@@ -77,14 +79,16 @@ export function AirplaneForm({ airplane, isOpen, onCancel, onSuccess }: Airplane
 
       if (airplane) {
         await updateAirplane(airplane.id, airplaneData)
+        showAirplaneSuccess("updated", airplane.registration)
       } else {
         await createAirplane(airplaneData)
+        showAirplaneSuccess("created", formData.registration)
       }
 
       onSuccess()
     } catch (error) {
       console.error("[v0] Error submitting form:", error)
-      alert("Error al guardar la aeronave")
+      showError("Error al guardar la aeronave", "Verifica que todos los datos sean correctos")
     } finally {
       setIsSubmitting(false)
     }

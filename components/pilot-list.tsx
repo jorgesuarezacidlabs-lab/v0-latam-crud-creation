@@ -9,6 +9,7 @@ import { useState } from "react"
 import { PilotForm } from "./pilot-form"
 import { deletePilot } from "@/app/actions"
 import { useRouter } from "next/navigation"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 type PilotListProps = {
   pilots: Pilot[]
@@ -21,17 +22,20 @@ const statusColors = {
 }
 
 export function PilotList({ pilots }: PilotListProps) {
+  const { showPilotSuccess, showError } = useAviationToast()
   const [editingPilot, setEditingPilot] = useState<Pilot | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const router = useRouter()
 
   const handleDelete = async (id: string) => {
+    const pilot = pilots.find(p => p.id === id)
     if (confirm("¿Estás seguro de que deseas eliminar este piloto?")) {
       try {
         await deletePilot(id)
+        showPilotSuccess("deleted", pilot?.name)
         router.refresh()
       } catch (error) {
-        alert("Error al eliminar el piloto")
+        showError("Error al eliminar el piloto", "No se pudo eliminar el piloto. Inténtalo de nuevo.")
       }
     }
   }

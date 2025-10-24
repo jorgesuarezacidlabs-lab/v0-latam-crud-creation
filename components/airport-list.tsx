@@ -8,23 +8,27 @@ import { useState } from "react"
 import { AirportForm } from "./airport-form"
 import { deleteAirport } from "@/app/actions"
 import { useRouter } from "next/navigation"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 type AirportListProps = {
   airports: Airport[]
 }
 
 export function AirportList({ airports }: AirportListProps) {
+  const { showAirportSuccess, showError } = useAviationToast()
   const [editingAirport, setEditingAirport] = useState<Airport | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const router = useRouter()
 
   const handleDelete = async (id: string) => {
+    const airport = airports.find(a => a.id === id)
     if (confirm("¿Estás seguro de que deseas eliminar este aeropuerto?")) {
       try {
         await deleteAirport(id)
+        showAirportSuccess("deleted", airport?.name)
         router.refresh()
       } catch (error) {
-        alert("Error al eliminar el aeropuerto")
+        showError("Error al eliminar el aeropuerto", "No se pudo eliminar el aeropuerto. Inténtalo de nuevo.")
       }
     }
   }

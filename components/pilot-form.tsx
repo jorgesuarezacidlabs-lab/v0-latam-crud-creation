@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createPilot, updatePilot } from "@/app/actions"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 type PilotFormProps = {
   pilot: Pilot | null
@@ -18,6 +19,7 @@ type PilotFormProps = {
 }
 
 export function PilotForm({ pilot, isOpen, onCancel, onSuccess }: PilotFormProps) {
+  const { showPilotSuccess, showError } = useAviationToast()
   const [formData, setFormData] = useState({
     name: "",
     license_number: "",
@@ -73,13 +75,15 @@ export function PilotForm({ pilot, isOpen, onCancel, onSuccess }: PilotFormProps
 
       if (pilot) {
         await updatePilot(pilot.id, pilotData)
+        showPilotSuccess("updated", pilot.name)
       } else {
         await createPilot(pilotData)
+        showPilotSuccess("created", formData.name)
       }
 
       onSuccess()
     } catch (error) {
-      alert("Error al guardar el piloto")
+      showError("Error al guardar el piloto", "Verifica que todos los datos sean correctos")
     } finally {
       setIsSubmitting(false)
     }

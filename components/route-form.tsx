@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Switch } from "@/components/ui/switch"
 import { createRoute, updateRoute } from "@/app/actions"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 type RouteFormProps = {
   route: Route | null
@@ -18,6 +19,7 @@ type RouteFormProps = {
 }
 
 export function RouteForm({ route, isOpen, onCancel, onSuccess }: RouteFormProps) {
+  const { showRouteSuccess, showError } = useAviationToast()
   const [formData, setFormData] = useState({
     route_code: "",
     origin: "",
@@ -70,13 +72,15 @@ export function RouteForm({ route, isOpen, onCancel, onSuccess }: RouteFormProps
 
       if (route) {
         await updateRoute(route.id, routeData)
+        showRouteSuccess("updated", route.route_code)
       } else {
         await createRoute(routeData)
+        showRouteSuccess("created", formData.route_code)
       }
 
       onSuccess()
     } catch (error) {
-      alert("Error al guardar la ruta")
+      showError("Error al guardar la ruta", "Verifica que todos los datos sean correctos")
     } finally {
       setIsSubmitting(false)
     }

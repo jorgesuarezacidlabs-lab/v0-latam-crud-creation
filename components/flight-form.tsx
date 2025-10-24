@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createFlight, updateFlight } from "@/app/actions"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 type FlightFormProps = {
   flight: Flight | null
@@ -18,6 +19,7 @@ type FlightFormProps = {
 }
 
 export function FlightForm({ flight, isOpen, onCancel, onSuccess }: FlightFormProps) {
+  const { showFlightSuccess, showError } = useAviationToast()
   const [formData, setFormData] = useState({
     flight_number: "",
     airplane_id: "",
@@ -74,13 +76,15 @@ export function FlightForm({ flight, isOpen, onCancel, onSuccess }: FlightFormPr
 
       if (flight) {
         await updateFlight(flight.id, flightData)
+        showFlightSuccess("updated", flight.flight_number)
       } else {
         await createFlight(flightData)
+        showFlightSuccess("created", formData.flight_number)
       }
 
       onSuccess()
     } catch (error) {
-      alert("Error al guardar el vuelo")
+      showError("Error al guardar el vuelo", "Verifica que todos los datos sean correctos")
     } finally {
       setIsSubmitting(false)
     }

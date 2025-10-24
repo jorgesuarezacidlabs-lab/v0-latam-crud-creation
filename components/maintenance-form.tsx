@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createMaintenance, updateMaintenance } from "@/app/actions"
+import { useAviationToast } from "@/lib/hooks/use-aviation-toast"
 
 type MaintenanceFormProps = {
   record: Maintenance | null
@@ -19,6 +20,7 @@ type MaintenanceFormProps = {
 }
 
 export function MaintenanceForm({ record, isOpen, onCancel, onSuccess }: MaintenanceFormProps) {
+  const { showMaintenanceSuccess, showError } = useAviationToast()
   const [formData, setFormData] = useState({
     airplane_id: "",
     maintenance_type: "Preventivo" as MaintenanceFormData["maintenance_type"],
@@ -75,13 +77,15 @@ export function MaintenanceForm({ record, isOpen, onCancel, onSuccess }: Mainten
 
       if (record) {
         await updateMaintenance(record.id, maintenanceData)
+        showMaintenanceSuccess("updated")
       } else {
         await createMaintenance(maintenanceData)
+        showMaintenanceSuccess("created")
       }
 
       onSuccess()
     } catch (error) {
-      alert("Error al guardar el registro")
+      showError("Error al guardar el registro", "Verifica que todos los datos sean correctos")
     } finally {
       setIsSubmitting(false)
     }
