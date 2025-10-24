@@ -1,16 +1,10 @@
 import { toast } from "@/lib/hooks/use-toast"
-import { CheckCircle, XCircle, AlertCircle, Info, Plane, Wrench, User, MapPin, Route } from "lucide-react"
 
 export function useAviationToast() {
   const showSuccess = (message: string, description?: string) => {
     toast({
       variant: "success",
-      title: (
-        <div className="flex items-center gap-2">
-          <CheckCircle className="h-4 w-4" />
-          {message}
-        </div>
-      ),
+      title: `✅ ${message}`,
       description,
     })
   }
@@ -18,12 +12,7 @@ export function useAviationToast() {
   const showError = (message: string, description?: string) => {
     toast({
       variant: "destructive",
-      title: (
-        <div className="flex items-center gap-2">
-          <XCircle className="h-4 w-4" />
-          {message}
-        </div>
-      ),
+      title: `❌ ${message}`,
       description,
     })
   }
@@ -31,12 +20,7 @@ export function useAviationToast() {
   const showWarning = (message: string, description?: string) => {
     toast({
       variant: "warning",
-      title: (
-        <div className="flex items-center gap-2">
-          <AlertCircle className="h-4 w-4" />
-          {message}
-        </div>
-      ),
+      title: `⚠️ ${message}`,
       description,
     })
   }
@@ -44,12 +28,7 @@ export function useAviationToast() {
   const showInfo = (message: string, description?: string) => {
     toast({
       variant: "info",
-      title: (
-        <div className="flex items-center gap-2">
-          <Info className="h-4 w-4" />
-          {message}
-        </div>
-      ),
+      title: `ℹ️ ${message}`,
       description,
     })
   }
@@ -64,12 +43,7 @@ export function useAviationToast() {
     
     toast({
       variant: "success",
-      title: (
-        <div className="flex items-center gap-2">
-          <Plane className="h-4 w-4" />
-          {messages[action]}
-        </div>
-      ),
+      title: `✈️ ${messages[action]}`,
       description: airplaneName ? `${airplaneName} ha sido ${action === "created" ? "registrada" : action === "updated" ? "actualizada" : "eliminada"}` : undefined,
     })
   }
@@ -83,12 +57,7 @@ export function useAviationToast() {
     
     toast({
       variant: "success",
-      title: (
-        <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4" />
-          {messages[action]}
-        </div>
-      ),
+      title: `🏢 ${messages[action]}`,
       description: airportName ? `${airportName} ha sido ${action === "created" ? "registrado" : action === "updated" ? "actualizado" : "eliminado"}` : undefined,
     })
   }
@@ -102,12 +71,7 @@ export function useAviationToast() {
     
     toast({
       variant: "success",
-      title: (
-        <div className="flex items-center gap-2">
-          <User className="h-4 w-4" />
-          {messages[action]}
-        </div>
-      ),
+      title: `👨‍✈️ ${messages[action]}`,
       description: pilotName ? `${pilotName} ha sido ${action === "created" ? "registrado" : action === "updated" ? "actualizado" : "eliminado"}` : undefined,
     })
   }
@@ -121,12 +85,7 @@ export function useAviationToast() {
     
     toast({
       variant: "success",
-      title: (
-        <div className="flex items-center gap-2">
-          <Route className="h-4 w-4" />
-          {messages[action]}
-        </div>
-      ),
+      title: `🛣️ ${messages[action]}`,
       description: routeCode ? `Ruta ${routeCode} ha sido ${action === "created" ? "registrada" : action === "updated" ? "actualizada" : "eliminada"}` : undefined,
     })
   }
@@ -140,12 +99,7 @@ export function useAviationToast() {
     
     toast({
       variant: "success",
-      title: (
-        <div className="flex items-center gap-2">
-          <Wrench className="h-4 w-4" />
-          {messages[action]}
-        </div>
-      ),
+      title: `🔧 ${messages[action]}`,
       description: airplaneName ? `Mantenimiento para ${airplaneName} ha sido ${action === "created" ? "registrado" : action === "updated" ? "actualizado" : "eliminado"}` : undefined,
     })
   }
@@ -159,12 +113,7 @@ export function useAviationToast() {
     
     toast({
       variant: "success",
-      title: (
-        <div className="flex items-center gap-2">
-          <Plane className="h-4 w-4" />
-          {messages[action]}
-        </div>
-      ),
+      title: `✈️ ${messages[action]}`,
       description: flightNumber ? `Vuelo ${flightNumber} ha sido ${action === "created" ? "registrado" : action === "updated" ? "actualizado" : "eliminado"}` : undefined,
     })
   }
